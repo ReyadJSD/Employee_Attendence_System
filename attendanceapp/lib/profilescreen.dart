@@ -26,16 +26,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController addressController = TextEditingController();
   @override
   void initState(){
-    _getUser();
+    // _getUser();
   }
-  String? empId;
-  Future<void> _getUser() async{
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    empId = sharedPreferences.getString('employeeId');
-    setState(() {
-      empId;
-    });
-  }
+  // String? empId;
+  // Future<void> _getUser() async{
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   empId = sharedPreferences.getString('employeeId');
+  //   setState(() {
+  //     empId;
+  //   });
+  // }
   void picUploadProfilePic() async {
     final image = await ImagePicker().pickImage(
         source: ImageSource.gallery,
@@ -62,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(15),
         child: Column(
           children: [
             GestureDetector(
@@ -70,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 picUploadProfilePic();
               },
               child: Container(
-                margin: const EdgeInsets.only(top: 80, bottom: 24),
+                margin: const EdgeInsets.only(top: 15, bottom: 10),
                 height: 120,
                 width: 120,
                 alignment: Alignment.center,
@@ -97,14 +97,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Align(
               child: Text(
-                "Employee ${empId}",
+                "Employee ${User.employeeId}",
                 style:const TextStyle(
                   fontFamily: 'Nexa Bold',
                   fontSize: 18
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
             User.conEdit ? textField('First Name', 'First Name', firstNameController) : field('First Name', User.firstName),
             User.conEdit ? textField('Last Name', 'Last Name', lastNameController) : field('Last Name', User.lastName),
 

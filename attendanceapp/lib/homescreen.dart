@@ -7,9 +7,10 @@ import 'package:attendanceapp/todayscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -30,15 +31,31 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _startLocationService();
-    getId().then((value) {
-      _getCredentials();
-      _getProfilePic();
-    });
+    _getUser();
   }
 
-  void _getCredentials() async{
-    try{
-      DocumentSnapshot doc = await FirebaseFirestore.instance.collection("Employee").doc(User.id).get();
+  Future<void> _getUser() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? empId = sharedPreferences.getString('employeeId');
+    setState(() {
+      User.employeeId = empId!;
+    });
+    if (User.employeeId != null) {
+      getId().then((value) {
+        _getCredentials();
+        _getProfilePic();
+      });
+    } else {
+      // Handle the case where employeeId is not found in shared preferences
+    }
+  }
+
+  void _getCredentials() async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection("Employee")
+          .doc(User.id)
+          .get();
       setState(() {
         User.conEdit = doc['conEdit'];
         User.firstName = doc['firstName'];
@@ -46,16 +63,23 @@ class _HomeScreenState extends State<HomeScreen> {
         User.birthDate = doc['birthDate'];
         User.address = doc['address'];
       });
-    }catch(e){
-      return;
+    } catch (e) {
+      print("Error fetching user credentials: $e");
     }
   }
 
-  void _getProfilePic() async{
-    DocumentSnapshot doc = await FirebaseFirestore.instance.collection("Employee").doc(User.id).get();
-    setState(() {
-      User.profilePicLinc = doc['profilePic'];
-    });
+  void _getProfilePic() async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection("Employee")
+          .doc(User.id)
+          .get();
+      setState(() {
+        User.profilePicLinc = doc['profilePic'];
+      });
+    } catch (e) {
+      print("Error fetching profile picture: $e");
+    }
   }
 
   void _startLocationService() async {
@@ -76,12 +100,26 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future <void> getId() async{
-    QuerySnapshot snap = await FirebaseFirestore.instance.collection("Employee")
-        .where('id', isEqualTo: User.employeeId).get();
-    setState(() {
-      User.id = snap.docs[0].id;
-    });
+  Future<void> getId() async {
+    try {
+      QuerySnapshot snap = await FirebaseFirestore.instance
+          .collection("Employee")
+          .where('id', isEqualTo: User.employeeId)
+          .get();
+
+      if (snap.docs.isNotEmpty) {
+        setState(() {
+          User.id = snap.docs[0].id;
+        });
+      } else {
+        print("No user found with the given ID");
+        // Handle the case where no documents are found with the given ID
+        // For example, you can show an error message or take appropriate action
+      }
+    } catch (e) {
+      print("Error fetching user ID: $e");
+      // Handle the error appropriately, e.g., show a snack bar with an error message
+    }
   }
 
   @override
@@ -93,70 +131,62 @@ class _HomeScreenState extends State<HomeScreen> {
       body: IndexedStack(
         index: currentIndex,
         children: [
-         CalendarScreen(),
+          CalendarScreen(),
           TodayScreen(), // Pass the employeeId here
           ProfileScreen(),
         ],
       ),
       bottomNavigationBar: Container(
         height: 70,
-        margin:const EdgeInsets.only(
-          left: 12,
-          right: 12,
-          bottom: 24
-        ),
+        margin: const EdgeInsets.only(left: 12, right: 12, bottom: 24),
         decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(40)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 10,
-              offset: Offset(2, 2)
-            )
-          ]
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(40)),
+            boxShadow: [
+              BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(2, 2))
+            ]),
         child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(40)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for(int i = 0; i<navigationIcons.length; i++)...<Expanded>{
+              for (int i = 0; i < navigationIcons.length; i++) ...<Expanded>{
                 Expanded(
-                    child: GestureDetector(
-                      onTap: (){
-                        setState(() {
-                          currentIndex = i;
-                        });
-                      },
-                      child: Container(
-                        height: screenHeight,
-                        width: screenWidth,
-                        color: Colors.white,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                  navigationIcons[i],
-                                color: i == currentIndex ? primary : Colors.black26,
-                                size: i == currentIndex ? 30 : 26,
-                              ),
-                              i == currentIndex ? Container(
-                                margin: EdgeInsets.only(top: 6),
-                                height: 3,
-                                width: 22,
-                                decoration: BoxDecoration(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        currentIndex = i;
+                      });
+                    },
+                    child: Container(
+                      height: screenHeight,
+                      width: screenWidth,
+                      color: Colors.white,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              navigationIcons[i],
+                              color: i == currentIndex ? primary : Colors.black26,
+                              size: i == currentIndex ? 30 : 26,
+                            ),
+                            i == currentIndex
+                                ? Container(
+                              margin: EdgeInsets.only(top: 6),
+                              height: 3,
+                              width: 22,
+                              decoration: BoxDecoration(
                                   borderRadius: BorderRadius.all(Radius.circular(40)),
-                                  color: primary
-                                ),
-                              ): const SizedBox()
-                            ],
-                          ),
+                                  color: primary),
+                            )
+                                : const SizedBox()
+                          ],
                         ),
                       ),
                     ),
+                  ),
                 )
               }
             ],

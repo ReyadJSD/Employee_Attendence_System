@@ -1,5 +1,5 @@
 import 'package:attendanceapp/homescreen.dart';
-import 'package:attendanceapp/todayscreen.dart';
+import 'package:attendanceapp/signupscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
   double screenWidth = 0;
   bool isKeyboardVisible = false;
   void setVisibility() {
-    print(333);
     isKeyboardVisible = true;
     setState(() {
 
@@ -47,23 +46,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 )
               ),
               child: Center(
-                child: Icon(
-                    Icons.person,
-                  color: Colors.white,
-                  size: screenWidth / 5,
+                child: Image.asset(
+                  "assets/icon/icon.png",
+                  width: screenWidth / 2.5,
                 ),
               ),
             ),
             Container(
               margin: EdgeInsets.only(
-                  top: screenHeight/15,
-                bottom: screenWidth / 20,
+                  top: screenHeight/30,
+                bottom: screenWidth / 30,
               ),
               child: Text(
                 'Login Here',
                 style: TextStyle(
                   fontSize: screenHeight / 18,
-                  fontFamily: "Nexa Bold"
+                  fontFamily: "Nexa Bold",
                 ),
               ),
             ),
@@ -99,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             sharedPreferences = await SharedPreferences.getInstance();
                             sharedPreferences.setString('employeeId', id).then((_){
                               Navigator.pushReplacement(context,
-                                  MaterialPageRoute(builder: (context) => HomeScreen())
+                                  MaterialPageRoute(builder: (context) =>const HomeScreen())
                               );
                             });
 
@@ -129,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Container(
                       height: 60,
                       width: screenWidth,
-                      margin: EdgeInsets.only(top: screenHeight / 30),
+                      margin: EdgeInsets.only(top: screenHeight / 45),
                       decoration: BoxDecoration(
                         color: primary,
                         borderRadius: const BorderRadius.all(Radius.circular(30))
@@ -146,7 +144,36 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 10,),
+                   GestureDetector(
+                     onTap: (){
+                       Navigator.pushReplacement(context,
+                           MaterialPageRoute(builder: (context) =>const SignUpScreen())
+                       );
+                     },
+                     child: Container(
+                      margin: const EdgeInsets.only(left: 70),
+                      child:const Row(
+                        children: [
+                          Text(
+                            "Don't have any account? ",
+                            style: TextStyle(
+                              fontSize: 15
+                            ),
+                          ),
+                          Text(
+                              "SignUp",
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15
+                            ),
+                          ),
+                        ],
+                      ),
+                  ),
+                   )
                 ],
               ),
             )
@@ -158,12 +185,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
  Widget fieldTitle(String title){
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
+      margin:const EdgeInsets.only(bottom: 5),
       child: Text(
         title,
         style: TextStyle(
             fontFamily: "Nexa Bold",
-            fontSize: screenWidth / 26
+            fontSize: screenWidth / 22
         ),
       ),
     );
@@ -186,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: screenWidth / 6,
             child: Icon(
               Icons.person,

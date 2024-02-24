@@ -100,7 +100,7 @@ class _TodayScreenState extends State<TodayScreen> {
                 },
                 child: Container(
                   alignment: Alignment.centerRight,
-                  margin: EdgeInsets.only(top: 32,left: 150),
+                  margin:const EdgeInsets.only(top: 32,left: 150),
                   child: Text(
                     'Logout',
                     style: TextStyle(
@@ -123,7 +123,7 @@ class _TodayScreenState extends State<TodayScreen> {
           ),
           Container(
             alignment: Alignment.centerLeft,
-            margin: EdgeInsets.only(top: 25),
+            margin:const EdgeInsets.only(top: 25),
             child: Text(
               'Todays Status',
               style: TextStyle(
@@ -207,10 +207,10 @@ class _TodayScreenState extends State<TodayScreen> {
             ),
           ),
           StreamBuilder(
-              stream: Stream.periodic(Duration(seconds: 1)),
+              stream: Stream.periodic(const Duration(seconds: 1)),
               builder: (context, snapshot) {
                 return Container(
-                  margin: EdgeInsets.only(bottom: 15),
+                  margin:const EdgeInsets.only(bottom: 15),
                   alignment: Alignment.centerLeft,
                   child: Text(
                     formatDate(DateTime.now(), [hh, ':', nn, ':', ss, ' ', am]),
@@ -226,7 +226,7 @@ class _TodayScreenState extends State<TodayScreen> {
 
                 QuerySnapshot snap = await FirebaseFirestore.instance
                     .collection("Employee")
-                    .where('id', isEqualTo: User.employeeId)
+                    .where('id', isEqualTo: empId)
                     .get();
 
                 DocumentSnapshot snap2 = await FirebaseFirestore.instance
@@ -273,11 +273,11 @@ class _TodayScreenState extends State<TodayScreen> {
                   });
                 }
               } else {
-                Timer(Duration(seconds: 3), () async {
+                Timer(const Duration(seconds: 3), () async {
                   await _getLocation();
                   QuerySnapshot snap = await FirebaseFirestore.instance
                       .collection("Employee")
-                      .where('id', isEqualTo: User.employeeId)
+                      .where('id', isEqualTo: empId)
                       .get();
 
                   DocumentSnapshot snap2 = await FirebaseFirestore.instance
@@ -396,7 +396,7 @@ class _TodayScreenState extends State<TodayScreen> {
     // Clear user session
     sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.remove('employeeId').then((_){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => AuthCheck(),));
+      Navigator.push(context, MaterialPageRoute(builder: (context) =>const AuthCheck(),));
     });
   }
 }
